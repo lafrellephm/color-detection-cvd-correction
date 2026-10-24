@@ -343,9 +343,13 @@ Pada pasangan yang tidak berhasil dikoreksi, pengaman membatalkan koreksi (kolom
 
 ### Tim Penyusun & Akademik
 
-- **Mata Kuliah / Tugas:** Belum dicantumkan pada repository, Week 8 Progress Submission (Computer Vision)
+- **Mata Kuliah / Tugas:** Teknologi Berkembang (A), Semester Gasal 2026, ITS
 - **Penulis / Tim:**
-    - `lafrellephm` (pemilik repository)
+    - `Rafsyah Fachri Isfansyah`
+    - `Laurentius Lafrellio Soewandi`
+    - `Muhammand Trinanda Thoriq`
+    - `Muhammad Faqih Maulana`
+    - `Satya Azka Aqilla`
 
 ### Lisensi
 
