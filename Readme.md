@@ -6,11 +6,6 @@ Prototipe sistem deteksi objek berwarna bernuansa, simulasi buta warna (_Color V
 ![OpenCV](https://img.shields.io/badge/OpenCV-5.0.0-green)
 ![NumPy](https://img.shields.io/badge/NumPy-2.4.4-orange)
 
-<!-- ![License](https://img.shields.io/badge/License-[ISI]-lightgrey) -->
-
-![Demo](docs/demo.gif)
-![Simulasi dan Koreksi CVD]([ISI: mis. docs/cvd_before_after.png])
-
 ---
 
 ## Latar Belakang & Tujuan
