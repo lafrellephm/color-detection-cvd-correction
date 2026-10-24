@@ -20,6 +20,9 @@ __pycache__/
 # Generated project archive
 hasil_cvd.zip
 
+# JPG files generated in the project root
+/*.jpg
+
 # Local environment and operating-system files
 .env
 .env.*
