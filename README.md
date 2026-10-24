@@ -6,6 +6,9 @@ Prototipe sistem deteksi objek berwarna bernuansa, simulasi buta warna (_Color V
 ![OpenCV](https://img.shields.io/badge/OpenCV-5.0.0-green)
 ![NumPy](https://img.shields.io/badge/NumPy-2.4.4-orange)
 
+![Perbandingan simulasi CVD dan hasil daltonization](hasil/perbandingan_cvd.png)
+_Perbandingan gambar asli, simulasi penglihatan CVD, dan hasil koreksi daltonization._
+
 ---
 
 ## Latar Belakang & Tujuan
@@ -63,7 +66,7 @@ pip install opencv-python numpy pandas matplotlib ipykernel
 
 ### 2. Membuka dan Menjalankan Notebook
 
-1. Buka folder proyek di **VS Code** dan buka file `Progress_Deteksi_Warna_ColorBlind.ipynb`.
+1. Buka folder proyek di **VS Code** dan buka file `Tekber_OpenCV_CVD_Kel7.ipynb`.
 2. Pilih _kernel_ Python dari `.venv` yang telah dibuat.
 3. **Urutan Eksekusi Sel Dasar & Evaluasi Gambar Statis:**
     - Jalankan **Sel 1 sampai Sel 19** secara berurutan untuk memuat fungsi inti, memverifikasi implementasi CIEDE2000, membuat gambar demo, menjalankan deteksi warna, simulasi CVD, evaluasi $\Delta E$, dan ekspor _batch_.
@@ -184,7 +187,7 @@ Nilai _Live_ berasal dari `PENGATURAN_LIVE` (Sel 20), yang juga memakai `segment
 
 ```text
 .
-├── Progress_Deteksi_Warna_ColorBlind.ipynb  # Notebook utama proyek
+├── Tekber_OpenCV_CVD_Kel7.ipynb  # Notebook utama proyek
 ├── dataset/                                 # Folder gambar input (dibuat otomatis oleh Sel 10)
 │   └── demo_nuansa.png                      # Gambar sintetis 16 warna untuk demo awal
 ├── hasil/                                   # Folder output (dibuat otomatis oleh Sel 10 & 19)
@@ -192,9 +195,9 @@ Nilai _Live_ berasal dari `PENGATURAN_LIVE` (Sel 20), yang juga memakai `segment
 │   ├── *_deteksi.png                        # Gambar dengan anotasi bounding box warna
 │   ├── *_daltonize_deuteranopia.png         # Gambar hasil koreksi daltonization
 │   └── deteksi_warna.csv                    # Tabel seluruh objek berwarna yang terdeteksi
-├── hasil_cvd.zip                            # Arsip ZIP dari seluruh isi folder hasil/ (Sel 19)
-├── foto.jpg                                 # Foto uji webcam (dibuat Sel 22)
-└── putih.jpg                                # Foto kertas putih untuk kalibrasi (dibuat Sel 23)
+├── hasil_cvd.zip                            # (Dibuat otomatis saat notebook dijalankan) Arsip ZIP dari seluruh isi folder hasil/ (Sel 19)
+├── foto.jpg                                 # (Dibuat otomatis saat notebook dijalankan) Foto uji webcam (dibuat Sel 22)
+└── putih.jpg                                # (Dibuat otomatis saat notebook dijalankan) Foto kertas putih untuk kalibrasi (dibuat Sel 23)
 ```
 
 _(Catatan: Folder `dataset_uji/` untuk pengujian foto nyata per subfolder nama warna disiapkan secara opsional pada Sel 18, namun belum dibuat secara default.)_
