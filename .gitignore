@@ -1,0 +1,28 @@
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Python cache and generated tooling files
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter temporary files
+.ipynb_checkpoints/
+
+# Local VS Code configuration
+.vscode/
+
+# Generated project archive
+hasil_cvd.zip
+
+# Local environment and operating-system files
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
