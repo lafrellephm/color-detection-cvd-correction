@@ -34,7 +34,7 @@ Penderita buta warna (_Color Vision Deficiency_ / CVD), yaitu protanopia, deuter
 
 ## Tech Stack & Prasyarat
 
-- **Bahasa & Lingkungan:** Python `[ISI: versi Python]`, dijalankan pada Jupyter Notebook lokal di VS Code.
+- **Bahasa & Lingkungan:** Python 3.10 atau lebih baru, dijalankan pada Jupyter Notebook lokal di VS Code.
 - **Pustaka Python:**
     - `opencv-python` (versi tercatat pada output: `5.0.0`)
     - `numpy` (versi tercatat pada output: `2.4.4`)
@@ -49,8 +49,8 @@ Penderita buta warna (_Color Vision Deficiency_ / CVD), yaitu protanopia, deuter
 ### 1. Persiapan Lingkungan
 
 ```bash
-git clone [ISI: URL repositori]
-cd [ISI: nama folder repo]
+git clone https://github.com/lafrellephm/color-detection-cvd-correction.git
+cd color-detection-cvd-correction
 
 python -m venv .venv
 # Aktivasi venv di Windows:
@@ -71,6 +71,7 @@ pip install opencv-python numpy pandas matplotlib ipykernel
     - Pada **Sel 10**, ubah variabel `CARA_INPUT`:
         ```python
         CARA_INPUT = "demo"    # Default: membuat gambar sintetis di dataset/demo_nuansa.png
+        # atau
         CARA_INPUT = "folder"  # Membaca semua gambar di folder dataset/
         ```
 5. **Urutan Menjalankan Deteksi Multi-Warna via Webcam (Sel 20 sampai 24):**
@@ -342,12 +343,10 @@ Pada pasangan yang tidak berhasil dikoreksi, pengaman membatalkan koreksi (kolom
 
 ### Tim Penyusun & Akademik
 
-- **Mata Kuliah / Tugas:** `[ISI: Nama Mata Kuliah & Dosen Pengampu]`, Week 8 Progress Submission (Computer Vision)
+- **Mata Kuliah / Tugas:** Belum dicantumkan pada repository, Week 8 Progress Submission (Computer Vision)
 - **Penulis / Tim:**
-    - `[ISI: Nama Anggota 1 - NIM]`
-    - `[ISI: Nama Anggota 2 - NIM]`
-    - `[ISI: Nama Anggota 3 - NIM]`
+    - `lafrellephm` (pemilik repository)
 
 ### Lisensi
 
-Didistribusikan di bawah lisensi `[ISI: mis. MIT License]`.
+Lisensi belum ditentukan pada repository ini. Tetapkan lisensi terlebih dahulu sebelum distribusi ulang.
