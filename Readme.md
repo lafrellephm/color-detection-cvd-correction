@@ -350,7 +350,3 @@ Pada pasangan yang tidak berhasil dikoreksi, pengaman membatalkan koreksi (kolom
     - `Muhammand Trinanda Thoriq`
     - `Muhammad Faqih Maulana`
     - `Satya Azka Aqilla`
-
-### Lisensi
-
-Lisensi belum ditentukan pada repository ini. Tetapkan lisensi terlebih dahulu sebelum distribusi ulang.
