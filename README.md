@@ -2,7 +2,7 @@
 
 Prototipe sistem deteksi objek berwarna bernuansa, simulasi buta warna (_Color Vision Deficiency_), dan koreksi warna (_daltonization_) berbasis ruang warna CIELAB dan jarak persepsi CIEDE2000. Mendukung pemrosesan gambar statis, evaluasi kuantitatif $\Delta E$, deteksi multi-warna _real-time_ lewat webcam, serta kamera buta warna yang menandai dan mengoreksi area warna yang melebur.
 
-![Python](https://img.shields.io/badge/Python-3-blue)
+![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![OpenCV](https://img.shields.io/badge/OpenCV-5.0.0-green)
 ![NumPy](https://img.shields.io/badge/NumPy-2.4.4-orange)
 
