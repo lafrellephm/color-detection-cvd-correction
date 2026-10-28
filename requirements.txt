@@ -1,0 +1,13 @@
+# Dependensi notebook Sistem Deteksi Warna & Koreksi Buta Warna (CVD)
+# Python 3.12. (Rekomendasi Python 3.12.10)
+
+# opencv-contrib-python menyediakan modul cv2 sekaligus modul tambahan
+# yang dibutuhkan MediaPipe. Jangan memasang opencv-python bersamaan.
+opencv-contrib-python
+numpy
+pandas
+matplotlib
+ipykernel
+
+# Dibutuhkan untuk Mode Gestur pada Sel 29-30.
+mediapipe

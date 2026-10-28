@@ -31,7 +31,7 @@ Penderita buta warna (_Color Vision Deficiency_ / CVD), yaitu protanopia, deuter
 6. **Evaluasi kuantitatif**: $\Delta E$ (CIEDE2000) antar pasangan warna sebelum/sesudah koreksi, evaluasi pada warna dominan gambar, uji ketahanan penamaan warna pada data sintetis, dan _benchmark_ kecepatan.
 7. **Ekspor _batch_ (`process_folder`)**: seluruh gambar di folder diproses menjadi gambar beranotasi, gambar hasil _daltonization_, tabel `deteksi_warna.csv`, dan arsip `hasil_cvd.zip`.
 8. **Deteksi multi-warna _real-time_ via webcam** (Sel 20 sampai 24) dengan pelacak IoU (`PelacakWarna`) agar kotak tidak berkedip, kalibrasi _white balance_ (`kalibrasi_putih`), dan koreksi eksposur gamma (`koreksi_eksposur`).
-9. **Kamera Buta Warna** (Sel 25 sampai 29): layar menampilkan tampilan penderita CVD, dan _toggle_ **Solusi** menandai area warna bersebelahan yang melebur (kotak, dua nama warna, nilai $\Delta E$) lalu menerapkan _daltonization_ lokal dengan pengaman. Tersedia **Mode Area** (seluruh layar) dan **Mode Fokus Tengah** (membaca dan mengoreksi satu kotak bidik).
+9. **Kamera Buta Warna** (Sel 25 sampai 30): layar menampilkan tampilan penderita CVD, dan _toggle_ **Solusi** menandai area warna bersebelahan yang melebur (kotak, dua nama warna, nilai $\Delta E$) lalu menerapkan _daltonization_ lokal dengan pengaman. Tersedia **Mode Area** (seluruh layar), **Mode Fokus Tengah** (membaca dan mengoreksi satu kotak bidik), dan **Mode Gestur** (jari telunjuk menggambar batas area lewat MediaPipe Hands; hanya area itu yang dibaca warnanya dan dikoreksi).
 
 ---
 
@@ -43,6 +43,7 @@ Penderita buta warna (_Color Vision Deficiency_ / CVD), yaitu protanopia, deuter
     - `numpy` (versi tercatat pada output: `2.4.4`)
     - `pandas`
     - `matplotlib`
+    - `mediapipe` (hanya untuk Mode Gestur; memakai Tasks API `HandLandmarker` dengan model `hand_landmarker.task` yang diunduh otomatis; ikut memasang `opencv-contrib-python`)
 - **Perangkat Keras & Kamera:** Webcam internal atau _virtual camera_ **Iriun Webcam** di Windows. Pembukaan kamera mencoba _backend_ `cv2.CAP_MSMF`, lalu `cv2.CAP_ANY`, lalu `cv2.CAP_DSHOW`.
 
 ---
@@ -61,8 +62,14 @@ python -m venv .venv
 # Aktivasi venv di Linux/macOS:
 source .venv/bin/activate
 
-pip install opencv-python numpy pandas matplotlib ipykernel
+pip install -r requirements.txt
 ```
+
+File `requirements.txt` memasang seluruh dependensi notebook, termasuk
+`mediapipe` untuk Mode Gestur. Jika hanya ingin menjalankan pemrosesan gambar
+statis tanpa Mode Gestur, `mediapipe` dapat dilewati dan dependensi inti
+dipasang dengan `opencv-python`, `numpy`, `pandas`, `matplotlib`, dan
+`ipykernel`.
 
 ### 2. Membuka dan Menjalankan Notebook
 
@@ -80,22 +87,34 @@ pip install opencv-python numpy pandas matplotlib ipykernel
 5. **Urutan Menjalankan Deteksi Multi-Warna via Webcam (Sel 20 sampai 24):**
     - Pastikan **Sel 1 sampai 8** sudah dijalankan.
     - Jalankan **Sel 20** (fungsi pemrosesan frame dan pelacak) $\rightarrow$ **Sel 21** (koneksi kamera Iriun, pemindaian kamera, `CAMERA_INDEX`) $\rightarrow$ **Sel 22** (tes satu foto dan koreksi eksposur) $\rightarrow$ **Sel 23** (_opsional_, kalibrasi kertas putih) $\rightarrow$ **Sel 24** (deteksi multi-warna _live_).
-6. **Urutan Menjalankan Kamera Buta Warna / CVD (Sel 25 sampai 29):**
+6. **Urutan Menjalankan Kamera Buta Warna / CVD (Sel 25 sampai 30):**
     - Pastikan **Sel 1 sampai 8** dan **Sel 20 sampai 21** sudah dijalankan.
-    - Jalankan **Sel 25** (konstanta, matriks simulasi Machado/Brettel, uji simulasi) $\rightarrow$ **Sel 26** (deteksi peleburan warna, _lookup table_, pelacak, koreksi lokal, Mode Fokus Tengah) $\rightarrow$ **Sel 27** (antarmuka OpenCV dan _overlay_) $\rightarrow$ **Sel 28** (uji tanpa kamera pada gambar sintetis) $\rightarrow$ **Sel 29** (kamera CVD _live_).
+    - Jalankan **Sel 25** (konstanta, matriks simulasi Machado/Brettel, uji simulasi) $\rightarrow$ **Sel 26** (deteksi peleburan warna, _lookup table_, pelacak, koreksi lokal, Mode Fokus Tengah) $\rightarrow$ **Sel 27** (antarmuka OpenCV dan _overlay_) $\rightarrow$ **Sel 28** (uji tanpa kamera pada gambar sintetis) $\rightarrow$ **Sel 29** (Mode Gestur tangan + uji laso tanpa kamera) $\rightarrow$ **Sel 30** (kamera CVD _live_).
 
-### Kontrol Navigasi Kamera Buta Warna (Sel 29)
+### Kontrol Navigasi Kamera Buta Warna (Sel 30)
 
 Kontrol dapat dilakukan dengan mengklik tombol di bagian atas jendela video atau menekan tombol _keyboard_ saat jendela OpenCV aktif:
 
 - `1` / `2` / `3` : Ganti mode simulasi ke **Protanopia** / **Deuteranopia** / **Tritanopia**.
 - `S` atau `Spasi` : _Toggle_ **Solusi** (`ON` / `OFF`) untuk mendeteksi area melebur dan mengaktifkan koreksi lokal.
-- `F` atau `M` : Ganti mode antara **Area** (seluruh layar) dan **Fokus Tengah**.
+- `F` atau `M` : Ganti mode berurutan **Area** (seluruh layar) $\rightarrow$ **Fokus Tengah** $\rightarrow$ **Gestur**.
+- `G` : Langsung ke **Mode Gestur**.
+- `C` atau klik kanan : Hapus area pada Mode Gestur (sekaligus membuka kunci gambar).
 - `-` / `+` : Perkecil / perbesar kotak bidik pada Mode Fokus Tengah (rentang 30 sampai 220 px, langkah 15 px).
 - `N` : _Toggle_ tampilan **Normal** (asli) vs tampilan simulasi CVD.
 - `Q` atau `ESC` : Menghentikan kamera dan menutup jendela.
 
-Pemanggilan bawaan Sel 29 adalah `jalankan_kamera_cvd(mode_fokus="tengah", mode_awal="deuteranopia")`. Ubah `mode_fokus="area"` untuk langsung memakai deteksi multi-area.
+Pemanggilan bawaan Sel 30 adalah `jalankan_kamera_cvd(mode_fokus="tengah", mode_awal="deuteranopia")`. Ubah `mode_fokus="area"` untuk langsung memakai deteksi multi-area, atau `mode_fokus="gestur"` untuk Mode Gestur. Saat kamera dihentikan, Sel 30 mencetak tabel statistik FPS per mode (Area / Tengah / Gestur, Solusi ON/OFF).
+
+### Gestur Tangan pada Mode Gestur
+
+- **Telunjuk saja** diacungkan: menggambar garis batas area.
+- **Ujung telunjuk kembali ke titik awal**: garis langsung ditutup menjadi area.
+- **Telunjuk + jari tengah**, gestur lain, atau tangan keluar layar: pena diangkat, garis ditutup menjadi area.
+- **Genggam** (keempat jari menekuk) ditahan sekitar 6 _frame_: **gambar dikunci**. Telunjuk, telapak, dan _mouse_ tidak lagi mengubah atau menghapus area, dan label `DIKUNCI` tampil di dekat area. Genggam sekali lagi untuk membuka kunci.
+- **Telapak terbuka ditahan** sekitar 12 _frame_: area dihapus (diabaikan saat gambar dikunci).
+- **Seret klik kiri _mouse_**: cadangan bila tangan tidak terdeteksi atau `mediapipe` belum terpasang.
+- **Hanya tangan terdekat yang dipakai**: jika beberapa tangan terlihat (mis. tangan orang lain di belakang), sistem memakai tangan dengan telapak terbesar di gambar. Tangan yang lebih kecil dari 4% lebar _frame_ diabaikan.
 
 ### Kontrol Webcam Multi-Warna (Sel 24)
 
@@ -135,6 +154,24 @@ flowchart LR
     H --> B
 ```
 
+### Diagram Alur Kamera Buta Warna (Mode Gestur)
+
+```mermaid
+flowchart LR
+    A[Frame Kamera] --> B[MediaPipe Hands: pilih tangan terdekat, 21 titik]
+    B --> C{Gestur stabil 3 frame}
+    C -->|Telunjuk saja| D[Tambah titik ke jejak laso]
+    C -->|Dua jari / hilang / kembali ke awal| E[Tutup jejak menjadi poligon area]
+    C -->|Telapak ditahan| F[Hapus area]
+    C -->|Genggam| L[Kunci / buka kunci gambar]
+    E --> G[Median + k-means warna di dalam area]
+    G --> H{Solusi ON dan pengaman dE lolos?}
+    H -->|Ya| I[Daltonization hanya di dalam area]
+    H -->|Tidak| J[Area tidak dikoreksi]
+    I --> K[Simulasi Penderita CVD - tampil]
+    J --> K
+```
+
 ### Algoritma & Metode Kunci
 
 - **Jarak Warna CIEDE2000 di Ruang CIELAB (`ciede2000`):** Jarak Euclidean pada ruang RGB tidak mencerminkan persepsi visual manusia. Sistem mengonversi sRGB ke CIELAB dan menghitung jarak dengan formula CIEDE2000 yang mengompensasi _lightness_ ($S_L$), _chroma_ ($S_C$), _hue_ ($S_H$), serta interaksi biru-ungu ($R_T$). Implementasi diverifikasi terhadap 5 data uji referensi Sharma, Wu, & Dalal (2005) dengan galat $< 10^{-3}$ (fungsi `uji_ciede2000`).
@@ -142,12 +179,13 @@ flowchart LR
 - **Penamaan dari Median Area:** Nama dan RGB sebuah objek diambil dari **median** piksel di dalam areanya (tahan _noise_ dan _highlight_), bukan dari satu piksel. Hasil ditandai `ambigu` bila kandidat kedua hampir sama dekatnya.
 - **Simulasi CVD di Ruang RGB Linear:** sRGB didekode ke RGB linear sebelum dikalikan matriks proyeksi, lalu dikodekan kembali. _Protanopia_ dan _deuteranopia_ memakai matriks **Machado et al. (2009)** dengan _severity_ 1,0. Untuk **tritanopia**:
     - Sel 14 sampai 17 (evaluasi gambar statis) memakai matriks Machado.
-    - Sel 25 sampai 29 (kamera CVD) memakai model dua bidang proyeksi **Brettel, Viénot, & Mollon (1997)**, dengan konstanta yang diturunkan dari _DaltonLens-Python_ (lisensi MIT).
+    - Sel 25 sampai 30 (kamera CVD) memakai model dua bidang proyeksi **Brettel, Viénot, & Mollon (1997)**, dengan konstanta yang diturunkan dari _DaltonLens-Python_ (lisensi MIT).
 - **_Daltonization_ (Pergeseran Error):** Informasi warna yang hilang (`warna asli - simulasi`) dikalikan matriks `ERR_SHIFT` lalu ditambahkan ke warna asli. Protan dan deutan memakai `[[0,0,0],[0.7,1,0],[0.7,0,1]]`, tritan memakai `[[1,0,0.7],[0,1,0.7],[0,0,0]]`. Ini adalah pendekatan heuristik.
 - **Percepatan _Real-Time_:** Konversi sRGB ke linear dipercepat dengan _lookup table_ (`_SRGB2LIN_LUT` 256 entri, `_LIN2SRGB_LUT` 4096 entri), kamera dibaca pada _background thread_ (`KameraStreamCepat`), dan pencarian area melebur dijalankan setiap `skip_deteksi` frame (bawaan `2`).
 - **Deteksi Area Warna Melebur (`cari_peleburan`):** Pada resolusi proses yang diperkecil dan setelah _Gaussian blur_, tiap piksel dibandingkan dengan tetangganya pada jarak `jarak` di 4 arah. Pasangan piksel ditandai "melebur" bila memenuhi dua syarat: terlihat jelas berbeda pada penglihatan normal ($\Delta E_{\text{normal}} \ge \text{DE\_NORMAL\_MIN}$) namun hampir sama setelah disimulasikan ($\Delta E_{\text{sim}} \le \text{DE\_SIM\_MAX}$). Saringan cepat $\Delta E_{76} \ge$ `prefilter_de76` hanya mempercepat, keputusan akhir memakai CIEDE2000. Piksel yang lolos digabung dengan morfologi _close_ dan `connectedComponentsWithStats`. Pada tiap area diambil warna median sisi terang dan sisi gelap, area dengan "kemurnian" rendah dibuang, lalu kedua warna diberi nama palet terdekat. Area dengan dua nama yang sama dibuang.
 - **Ambang Batas Efektif:** Sel 25 mendefinisikan `DE_NORMAL_MIN = 25` dan `DE_SIM_MAX = 10`, tetapi **Sel 26 menimpanya menjadi `16` dan `15`** agar deteksi lebih peka pada kamera nyata. Pada tahap verifikasi median diberi toleransi (`DE_NORMAL_MIN * 0.85` dan `DE_SIM_MAX * 1.15`).
-- **_Daltonization_ Lokal dengan Pengaman (`koreksi_pasangan` & `terapkan_koreksi_lokal`):** Untuk tiap pasangan warna, koreksi dicoba pada kekuatan `KEKUATAN_COBA = (1.0, 1.4, 1.8)` dan dipilih yang memberi $\Delta E_{\text{sesudah}}$ terbesar. **Pengaman:** koreksi hanya diterapkan bila $\Delta E_{\text{sesudah}} > \Delta E_{\text{sebelum}}$. Jika tidak, kotak diberi tanda "tidak membaik" dan tidak ada koreksi. Koreksi hanya mengenai piksel yang dekat dengan kedua warna (jarak Lab $< 24$) dan terhubung dengan kotak peleburan.
+- **_Daltonization_ Lokal dengan Pengaman (`koreksi_pasangan` & `terapkan_koreksi_lokal`):** Untuk tiap pasangan warna, koreksi dicoba pada kekuatan `KEKUATAN_COBA = (1.0, 1.4, 1.8)` dan dipilih yang memberi $\Delta E_{\text{sesudah}}$ terbesar. **Pengaman:** koreksi hanya diterapkan bila $\Delta E_{\text{sesudah}} > \Delta E_{\text{sebelum}}$. Jika tidak, kotak diberi tanda "tidak membaik" dan tidak ada koreksi. Koreksi hanya mengenai piksel yang dekat dengan kedua warna (jarak Lab $< 24$), terhubung dengan kotak peleburan, **dan berada di dalam kotak**. Piksel berwarna mirip di luar kotak tidak ikut dikoreksi. Pada Mode Gestur, koreksi juga hanya diterapkan di dalam area laso. Di kedua mode, area di luar kotak/laso tetap tampil sebagai simulasi penderita tanpa koreksi.
+- **Mode Gestur (`DeteksiTangan`, `PenggambarLaso`, `analisis_area_laso`):** Tangan dideteksi dengan MediaPipe Hands (Zhang et al., 2020). Mediapipe versi baru tidak lagi menyediakan `mp.solutions`, jadi sistem memakai Tasks API `HandLandmarker` (mode VIDEO) dan otomatis jatuh ke `mp.solutions.hands` pada versi lama. Model mendeteksi hingga 4 tangan, lalu hanya tangan dengan ukuran telapak terbesar di gambar (rata-rata jarak pergelangan ke pangkal jari tengah dan lebar telapak; makin besar berarti makin dekat ke kamera) yang dipakai. Tangan yang lebih kecil dari `UKURAN_MIN_TANGAN = 0.04` x lebar _frame_ diabaikan, dan tangan yang sedang dipakai mendapat bonus skor 25% agar pilihan tidak berpindah-pindah. Jari dianggap lurus bila jarak ujung ke pergelangan $> 1,10\times$ jarak sendi PIP ke pergelangan; genggam (empat jari menekuk) ditahan 6 _frame_ mengunci atau membuka kunci gambar. Jejak ujung telunjuk disederhanakan dengan `approxPolyDP` menjadi poligon; garis < 8 titik atau area < 0,4% _frame_ ditolak. Di dalam area dihitung warna median dan hingga 3 warna dominan (_k-means_). **Pengaman:** jika ada $\ge 2$ warna dominan (porsi $\ge 12\%$), koreksi harus menaikkan $\Delta E$ terkecil antar warna dominan setelah simulasi; jika hanya 1 warna, koreksi harus menaikkan $\Delta E$ antara area dan cincin 15 px di sekitarnya (dan area tidak dikoreksi bila sudah mirip dengan sekitarnya pada penglihatan normal).
 - **Pelacak:** `PelacakWarna` (webcam multi-warna) dan `PelacakPeleburan` (kamera CVD) mencocokkan kotak antar-frame lewat IoU, menghaluskan posisi, dan menahan label beberapa frame agar tidak berkedip. `PelacakPeleburan` menampilkan kotak sejak frame pertama (`min_umur=1`) dan mempertahankannya hingga 3 frame setelah hilang.
 
 ### Parameter Penting `detect_colors()`
@@ -197,6 +235,7 @@ Nilai _Live_ berasal dari `PENGATURAN_LIVE` (Sel 20), yang juga memakai `segment
 │   └── deteksi_warna.csv                    # Tabel seluruh objek berwarna yang terdeteksi
 ├── hasil_cvd.zip                            # (Dibuat otomatis saat notebook dijalankan) Arsip ZIP dari seluruh isi folder hasil/ (Sel 19)
 ├── foto.jpg                                 # (Dibuat otomatis saat notebook dijalankan) Foto uji webcam (dibuat Sel 22)
+├── hand_landmarker.task                     # (Diunduh otomatis saat Mode Gestur pertama dipakai) Model MediaPipe Hands
 └── putih.jpg                                # (Dibuat otomatis saat notebook dijalankan) Foto kertas putih untuk kalibrasi (dibuat Sel 23)
 ```
 
@@ -256,7 +295,7 @@ Pengujian terhadap $k=6$ warna dominan pada gambar keseluruhan dengan _daltoniza
 | **Deuteranopia** |             43,2             |             40,2             |            17,3            |            18,0            |          −7,0%          |
 | **Tritanopia**   |             43,1             |             34,9             |            14,2            |            10,9            |         −19,0%          |
 
-### 4. Akurasi Penamaan Warna & Benchmark Kecepatan (Sel 17, 18, 28, & 29)
+### 4. Akurasi Penamaan Warna & Benchmark Kecepatan (Sel 17, 18, 28, & 30)
 
 - **Uji Penamaan Sintetis (`synthetic_naming_test`):** akurasi rata-rata **99,2% untuk nuansa** dan **99,2% untuk keluarga warna** (parameter bawaan fungsi: 50 sampel per warna dengan gangguan kecerahan acak $\pm 10\%$ dan pergeseran warna 6,0). Dari 34 warna, 27 mencapai 100%. Kesalahan terjadi pada:
 
@@ -290,17 +329,18 @@ Pada pasangan yang tidak berhasil dikoreksi, pengaman membatalkan koreksi (kolom
 | **Gambar Statis (Sel 17)**   | Deteksi warna + _bounding box_  | `1000x640` px (rata-rata 5x jalan)                        |        162,1         |       6,2       |
 |                              | _Daltonization_ global          | `1000x640` px (rata-rata 5x jalan)                        |        177,9         |       5,6       |
 |                              | Simulasi CVD global             | `1000x640` px (rata-rata 5x jalan)                        |        130,5         |       7,7       |
-| **Kamera CVD Live (Sel 29)** | Pipeline Kamera CVD _real-time_ | Lebar frame `480` px, LUT, `skip_deteksi=2` (4.435 frame) |         17,8         |      35,5       |
+| **Kamera CVD Live (Sel 30)** | Pipeline Kamera CVD _real-time_ | Lebar frame `480` px, LUT, `skip_deteksi=2` (4.435 frame) |         17,8         |      35,5       |
 
 ### Keterbatasan Teknis
 
 1. **Akurasi Penamaan Berasal dari Data Sintetis:** Angka 99,2% diperoleh dari gangguan matematis terhadap warna referensi palet, bukan dari tangkapan sensor kamera pada objek fisik dengan pantulan dan bayangan nyata. Evaluasi pada foto nyata (`dataset_uji/`) belum dilakukan.
 2. **_Daltonization_ Tidak Selalu Meningkatkan Keterbedaan Warna:** Pergeseran matriks _error_ linier bersifat heuristik. Pada Sel 15, 5 dari 18 pasangan tidak membaik (_Ungu vs Biru_ pada protan dan deutan, _Hijau vs Coklat_ pada deutan, _Biru Muda vs Abu-abu Muda_ dan _Oranye vs Merah_ pada tritan), dan pada Sel 16 rata-rata $\Delta E$ antar 6 warna dominan justru menurun (−7,0% hingga −19,0%). Karena itu kamera CVD (Sel 26) memakai _daltonization_ **lokal** dengan pengaman $\Delta E_{\text{sesudah}} > \Delta E_{\text{sebelum}}$.
-3. **Dua Model Simulasi Tritanopia:** Evaluasi statis (Sel 14 sampai 17) memakai matriks Machado untuk tritanopia, sedangkan kamera CVD (Sel 25 sampai 29) memakai Brettel 1997. Hasil tritanopia di kedua bagian tidak langsung sebanding.
-4. **Perbedaan FPS Statis vs Live:** Sel 17 memproses gambar resolusi penuh (`1000x640` px) dengan perhitungan gamma `float64` di setiap piksel sehingga hanya mencapai sekitar 5,6 sampai 7,7 FPS. Pada Sel 26 sampai 29 kecepatan mencapai 35,5 FPS karena frame diperkecil (`lebar=480`, `sisi_proses=180`), konversi gamma memakai _lookup table_, kamera dibaca pada _background thread_, dan pencarian area melebur hanya dijalankan setiap 2 frame. Output Sel 29 tidak mencatat mode yang dipakai saat pengukuran, sedangkan pemanggilan bawaannya adalah Mode Fokus Tengah yang tidak menjalankan `cari_peleburan`. Angka 35,5 FPS belum tentu mewakili Mode Area dengan Solusi `ON`.
+3. **Dua Model Simulasi Tritanopia:** Evaluasi statis (Sel 14 sampai 17) memakai matriks Machado untuk tritanopia, sedangkan kamera CVD (Sel 25 sampai 30) memakai Brettel 1997. Hasil tritanopia di kedua bagian tidak langsung sebanding.
+4. **Perbedaan FPS Statis vs Live:** Sel 17 memproses gambar resolusi penuh (`1000x640` px) dengan perhitungan gamma `float64` di setiap piksel sehingga hanya mencapai sekitar 5,6 sampai 7,7 FPS. Pada Sel 26 sampai 30 kecepatan mencapai 35,5 FPS karena frame diperkecil (`lebar=480`, `sisi_proses=180`), konversi gamma memakai _lookup table_, kamera dibaca pada _background thread_, dan pencarian area melebur hanya dijalankan setiap 2 frame. Output pengukuran tersebut tidak mencatat mode yang dipakai, sedangkan pemanggilan bawaannya adalah Mode Fokus Tengah yang tidak menjalankan `cari_peleburan`. Angka 35,5 FPS belum tentu mewakili Mode Area dengan Solusi `ON`.
 5. **Ambang Dilonggarkan, Belum Ada Uji _False Positive_:** Ambang efektif `16` dan `15` (dan parameter `PARAM_A` yang diturunkan) membuat deteksi lebih peka, tetapi belum dievaluasi seberapa sering muncul kotak yang tidak relevan.
 6. **Sensitivitas Pencahayaan dan _White Balance_:** Pembacaan warna dipengaruhi _auto-exposure_, _auto white balance_, dan spektrum lampu ruangan. Kalibrasi putih dan koreksi eksposur hanya mengurangi masalah, dan area yang sudah terpotong di nilai putih tidak dapat dipulihkan.
-7. **Cakupan Palet dan Model Simulasi:** Penamaan bergantung pada 34 warna di `PALETTE`. Simulasi memakai _severity_ 1,0 (dikromat penuh), merupakan pendekatan model matematis, dan bukan pengujian pada penderita buta warna sungguhan.
+7. **Mode Gestur Belum Diukur:** Area laso menempel pada koordinat layar sehingga tidak mengikuti benda yang bergerak. Pemilihan tangan terdekat memakai ukuran tangan di gambar sebagai perkiraan jarak, bukan pengukuran kedalaman. Pada Mode Area, benda melebur yang lebih besar dari kotaknya hanya dikoreksi di bagian dalam kotak sehingga dapat tampak batas lurus di tepi kotak. FPS Mode Gestur (model tangan berjalan setiap _frame_) dan keandalan pengenalan gestur pada kamera nyata belum diukur; gunakan tabel statistik per mode dari Sel 30.
+8. **Cakupan Palet dan Model Simulasi:** Penamaan bergantung pada 34 warna di `PALETTE`. Simulasi memakai _severity_ 1,0 (dikromat penuh), merupakan pendekatan model matematis, dan bukan pengujian pada penderita buta warna sungguhan.
 
 ---
 
@@ -310,11 +350,11 @@ Pada pasangan yang tidak berhasil dikoreksi, pengaman membatalkan koreksi (kolom
   Jalankan **Sel 21** dan perhatikan daftar pada `=== Daftar Kamera yang Terdeteksi ===`. Pastikan aplikasi Iriun Webcam di PC dan HP sudah aktif, tutup aplikasi lain yang memakai kamera (Zoom/Browser), lalu sesuaikan `CAMERA_INDEX` di Sel 21 (pada catatan run, kamera terdeteksi di indeks `0` dan `1`, dan `CAMERA_INDEX = 1` dipakai).
 - **Jendela `cv2.imshow` tidak merespons tombol keyboard:**
   Di VS Code, fokus kursor sering tertinggal di editor kode saat sel dijalankan. Klik jendela pop-up video OpenCV terlebih dahulu sebelum menekan tombol, atau langsung klik tombol pada bar di bagian atas video.
-- **Konflik `opencv-python` vs `opencv-contrib-python`:**
-  Gunakan satu distribusi saja di dalam _virtual environment_:
+- **Konflik `opencv-python` vs `opencv-contrib-python` (impor `cv2` lambat atau error):**
+  Gunakan satu distribusi saja di dalam _virtual environment_. Karena `mediapipe` ikut memasang `opencv-contrib-python`, pakai distribusi tersebut jika Mode Gestur dipakai (isinya sudah mencakup `opencv-python`):
     ```bash
     pip uninstall opencv-python opencv-contrib-python -y
-    pip install opencv-python
+    pip install opencv-contrib-python   # atau opencv-python jika tidak memakai mediapipe
     ```
 - **Gambar kamera terlalu terang (pucat) atau warna melenceng karena lampu ruangan:**
   Gunakan kalibrasi putih pada **Sel 23** (atau tekan `K` saat webcam live di Sel 24) dengan mengarahkan kertas putih ke kotak tengah. Untuk foto uji yang terlalu terang, biarkan `KOREKSI_SOFTWARE = True` di **Sel 22** agar `koreksi_eksposur` menerapkan koreksi gamma (gamma maksimum `2.0`, target kecerahan `TARGET_TERANG = 0.45`).
@@ -322,6 +362,16 @@ Pada pasangan yang tidak berhasil dikoreksi, pengaman membatalkan koreksi (kolom
   Ambang di Sel 26 sudah dilonggarkan. Kembalikan ke nilai awal yang tercatat pada komentar notebook (`DE_NORMAL_MIN = 25`, `DE_SIM_MAX = 10`, `min_piksel = 40`, `luas_min_kotak = 0.004`, `kemurnian_min = 0.20`, `prefilter_de76 = 15.0`) lalu jalankan ulang Sel 26.
 - **Kotak peleburan terlalu jarang muncul ("malu-malu"):**
   Turunkan `DE_NORMAL_MIN` atau naikkan `DE_SIM_MAX` di Sel 26, atau turunkan `min_piksel` dan `kemurnian_min` pada `PARAM_A`.
+- **`AttributeError: module 'mediapipe' has no attribute 'solutions'`:**
+  Mediapipe versi baru menghapus `mp.solutions`. Sel 29 sudah memakai Tasks API (`HandLandmarker`), jadi cukup jalankan Sel 29 lalu Sel 30. Jika `pip install mediapipe` gagal pada versi Python yang dipakai, buat _virtual environment_ dengan versi Python yang didukung MediaPipe.
+- **Model tangan gagal diunduh / Mode Gestur menampilkan "MediaPipe tidak aktif":**
+  Pastikan ada koneksi internet saat Mode Gestur pertama dipakai, atau unduh `hand_landmarker.task` secara manual ke folder proyek. Sementara itu area tetap dapat digambar dengan menyeret klik kiri _mouse_.
+- **Tangan sendiri ikut diabaikan atau tangan orang lain masih terpilih:**
+  Ubah `UKURAN_MIN_TANGAN` di Sel 29 (turunkan, mis. `0.03`, jika tangan sendiri diabaikan saat agak jauh dari kamera; naikkan jika tangan orang di belakang masih terdeteksi). Pemilihan berdasarkan ukuran tangan di gambar, bukan jarak sebenarnya, sehingga tangan orang lain yang sangat dekat ke kamera tetap dapat terpilih.
+- **Area tidak bisa digambar ulang / dihapus:**
+  Gambar mungkin sedang dikunci (label `DIKUNCI`). Genggam sekali lagi untuk membuka kunci, atau tekan `C`.
+- **Garis gestur putus-putus atau area tertutup terlalu cepat:**
+  Acungkan telunjuk dengan jelas (jari lain menekuk) dan pastikan seluruh tangan terlihat kamera. Nilai `stabil`, `min_jarak`, dan `jarak_tutup` pada `PenggambarLaso` (Sel 29) dapat dinaikkan.
 - **Warna latar putih ikut dideteksi pada deteksi objek umum:**
   Tambahkan `"Putih"` atau `"Abu-abu Muda"` ke `ignore_names`, atau gunakan `ignore_families=("Netral",)`.
 - **Kotak deteksi multi-warna berkedip atau terpecah:**
@@ -343,6 +393,7 @@ Pada pasangan yang tidak berhasil dikoreksi, pengaman membatalkan koreksi (kolom
 1. **Sharma, G., Wu, W., & Dalal, E. N. (2005).** _The CIEDE2000 color-difference formula: Implementation notes, supplementary test data, and mathematical observations._ Color Research & Application, 30(1), 21-30.
 2. **Machado, G. M., Oliveira, M. M., & Fernandes, L. A. F. (2009).** _A physiologically-based model for simulation of color vision deficiency._ IEEE Transactions on Visualization and Computer Graphics, 15(6), 1291-1298.
 3. **Brettel, H., Viénot, F., & Mollon, J. D. (1997).** _Computerized simulation of color appearance for dichromats._ Journal of the Optical Society of America A, 14(10), 2647-2655 (konstanta matriks diturunkan dari _DaltonLens-Python_, lisensi MIT).
+4. **Zhang, F., Bazarevsky, V., Vakunov, A., Tkachenka, A., Sung, G., Chang, C.-L., & Grundmann, M. (2020).** _MediaPipe Hands: On-device real-time hand tracking._ arXiv:2006.10214.
 
 ### Tim Penyusun & Akademik
 

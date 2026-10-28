@@ -26,6 +26,7 @@ hasil_cvd.zip
 # Local environment and operating-system files
 .env
 .env.*
+.venv*
 !.env.example
 .DS_Store
 Thumbs.db
